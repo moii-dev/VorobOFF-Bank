@@ -12,31 +12,31 @@ export const SKINS: Skin[] = [
     id: 'default',
     name: 'Обычный Воробьёв',
     price: 0,
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vorobyov&backgroundColor=e6f4ea'
+    avatarUrl: '/img/1.jpg'
   },
   {
     id: 'businessman',
-    name: 'Бизнесмен',
+    name: 'Простой воробьев',
     price: 100000,
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Business&backgroundColor=b6e3f4&accessories=sunglasses&clothes=blazerAndShirt'
+    avatarUrl: '/img/2.jpg'
   },
   {
     id: 'mafia',
-    name: 'Мафиози',
+    name: 'Жирный воробьев',
     price: 200000,
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mafia&backgroundColor=ffdfbf&accessories=kurt&clothes=collarAndSweater'
+    avatarUrl: '/img/3.jpg'
   },
   {
     id: 'cyborg',
-    name: 'Киборг',
+    name: 'Умирающий воробьев',
     price: 500000,
-    avatarUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Cyborg&backgroundColor=c0aede'
+    avatarUrl: '/img/4.jpg'
   },
   {
     id: 'golden',
-    name: 'Золотой Воробьёв',
+    name: 'Хомяк воробьев',
     price: 1000000,
-    avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Golden&backgroundColor=fef08a&accessories=prescription02&clothes=hoodie'
+    avatarUrl: '/img/5.jpg'
   }
 ];
 
@@ -182,7 +182,6 @@ export const DICT: Record<string, string> = {
   'Надеть': '装备',
   'Надето': '已装备',
   'Купить': '买',
-  'ВоробьOFF': '沃罗比OFF',
   'История': '历史',
   'Ничего нет': '这里什么都没有',
   'Цена:': '价格：',
@@ -206,6 +205,40 @@ export const DICT: Record<string, string> = {
   'Имя и Фамилия получателя': '收款人姓名',
   'Перевести по СБП': '通过 SBP 转账',
   'История операций': '操作历史',
+  'Вода «Шишкин Лес»': '森林之水',
+  'Картофель фри': '炸薯条',
+  'Хот-дог': '热狗',
+  'Наггетсы': '炸鸡块',
+  'Бургер': '汉堡',
+  'Пицца': '披萨',
+  'Чай Улун': '乌龙茶',
+  'Смартфон Huawei': '华为手机',
+  'Цитатник Си': '习语录',
+  'Билет в Пекин': '去北京的机票',
+  'Плюшевый медведь': '维尼熊',
+  'Статуя Дракона': '龙像',
+  'Покупка:': '购买：',
+  'Перевод:': '转账：',
+  'От:': '来自：',
+  'Покупка скина:': '购买皮肤：',
+  'Скин куплен:': '皮肤已购买：',
+  'Перевод выполнен:': '转账完成：',
+  '+1 ₽/клик': '+1 ₽/点击',
+  '+2 ₽/сек': '+2 ₽/秒',
+  '+5 ₽/клик': '+5 ₽/点击',
+  '+10 ₽/сек': '+10 ₽/秒',
+  '+25 ₽/клик': '+25 ₽/点击',
+  '+50 ₽/сек': '+50 ₽/秒',
+  '+100 ₽/клик': '+100 ₽/点击',
+  '+200 ₽/сек': '+200 ₽/秒',
+  '+500 ₽/клик': '+500 ₽/点击',
+  '+1000 ₽/сек': '+1000 ₽/秒',
+  '+2500 ₽/клик': '+2500 ₽/点击',
+  '+5000 ₽/сек': '+5000 ₽/秒',
+  'Вкусно — и точка (McDonald\'s)': 'McDonald\'s (美味 - 就是这样)',
+  'Списание: Вкусно — и точка': '扣除：McDonald\'s',
+  'У вас': '你有',
+  'мин.': '分钟',
 };
 
 export const t = (text: string, lang: 'ru' | 'zh') => lang === 'zh' ? (DICT[text] || text) : text;

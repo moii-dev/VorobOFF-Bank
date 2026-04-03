@@ -71,12 +71,39 @@ export default function App() {
               initial={{ opacity: 0, y: -50, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -20, scale: 0.9 }}
-              className="absolute top-6 left-6 right-6 z-50 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-3 rounded-full shadow-xl flex items-center gap-3"
+              className="absolute top-6 left-6 right-6 z-50 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-3 rounded-[1.5rem] shadow-xl flex items-center gap-4 border border-zinc-200 dark:border-zinc-800"
             >
-              <div className="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center shrink-0">
-                <span className="text-white font-bold text-sm">!</span>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden ${
+                typeof notification === 'string' ? 'bg-yellow-500' :
+                notification.type === 'party' ? 'bg-red-600' : 
+                notification.type === 'transfer' ? 'bg-blue-500' : 
+                notification.type === 'success' ? 'bg-green-500' : 
+                (notification.type === 'mcd' || notification.type === 'vkusn') ? 'bg-transparent' : 'bg-yellow-500'
+              }`}>
+                {typeof notification === 'object' && notification.type === 'mcd' ? (
+                  <img src="/img/mac.jpg" alt="M" className="w-full h-full object-cover" />
+                ) : typeof notification === 'object' && notification.type === 'vkusn' ? (
+                  <img src="/img/vkusn.jpg" alt="V" className="w-full h-full object-cover" />
+                ) : typeof notification === 'object' && notification.type === 'party' ? (
+                  <span className="text-lg">🇨🇳</span>
+                ) : typeof notification === 'object' && notification.type === 'transfer' ? (
+                  <Send className="w-5 h-5 text-white" />
+                ) : typeof notification === 'object' && notification.type === 'success' ? (
+                  <ShoppingBag className="w-5 h-5 text-white" />
+                ) : (
+                  <span className="text-white font-bold text-lg">!</span>
+                )}
               </div>
-              <span className="font-medium text-sm">{t(notification, state.language)}</span>
+              <div className="flex flex-col min-w-0">
+                <span className="font-semibold text-sm leading-tight">
+                  {typeof notification === 'string' ? t(notification, state.language) : t(notification.message, state.language)}
+                </span>
+                {typeof notification === 'object' && notification.comment && (
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500 italic mt-0.5 truncate">
+                    «{t(notification.comment, state.language)}»
+                  </span>
+                )}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

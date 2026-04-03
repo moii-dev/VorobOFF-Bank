@@ -55,7 +55,7 @@ export function Home({ state, onClick }: HomeProps) {
 
         {/* Top row: Bank Name & Visa Logo */}
         <div className="flex justify-between items-start relative z-10">
-          <span className="text-lg font-bold tracking-wider opacity-95 drop-shadow-sm">{t('ВоробьOFF', state.language)}</span>
+          <span className="text-lg font-bold tracking-wider opacity-95 drop-shadow-sm">ВоробьOFF</span>
           {/* Visa Logo SVG */}
           <svg className="w-12 h-auto opacity-90 drop-shadow-sm" viewBox="0 0 32 10" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M14.52 0.400024H12.68L10.32 6.80002L9.92 4.80002C9.72 3.60002 8.88 2.80002 7.72 2.40002L3.6 1.60002L3.52 2.00002C4.36 2.40002 5.56 3.20002 6.04 4.40002L8.08 9.60002H10.12L14.52 0.400024ZM22.4 0.400024H20.64C20.08 0.400024 19.64 0.800024 19.4 1.20002L16.48 8.40002L18.52 9.60002L18.92 8.40002H21.4L21.68 9.60002H23.52L22.4 0.400024ZM19.52 6.80002L20.48 4.00002L21.04 6.80002H19.52ZM28.64 0.400024C27.68 0.400024 26.04 0.800024 26.04 2.80002C26.04 4.80002 28.84 4.80002 28.84 6.00002C28.84 6.80002 27.68 7.20002 26.68 7.20002C25.56 7.20002 24.8 6.80002 24.16 6.40002L23.76 8.00002C24.44 8.40002 25.52 8.80002 26.72 8.80002C28.84 8.80002 30.88 7.60002 30.88 5.60002C30.88 2.80002 28.08 2.80002 28.08 2.00002C28.08 1.60002 28.84 1.20002 29.84 1.20002C30.64 1.20002 31.28 1.60002 31.84 2.00002L32.24 0.400024C31.56 0.0000244141 30.24 -0.0000244141 28.64 0.400024ZM5.28 0.400024H0L0.04 0.800024L3.6 9.60002H5.68L8.24 0.400024H5.28Z" fill="currentColor"/>

@@ -4,12 +4,11 @@ import { ArrowUpRight, ShoppingBag, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { t } from '../constants';
 
-const getIcon = (tx: Transaction) => {
+const getIcon = (tx: Transaction, language: 'ru' | 'zh') => {
   if (tx.title.includes('McDonald') || tx.title.includes('Вкусно — и точка')) {
+    const iconSrc = language === 'zh' ? '/img/mac.jpg' : '/img/vkusn.jpg';
     return (
-      <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-        <path d="M21.49 19.18c-1.52-8.46-4.47-14.68-8.49-14.68-2.28 0-4.29 2.38-5.5 6.38-1.21-4-3.22-6.38-5.5-6.38-4.02 0-6.97 6.22-8.49 14.68-.22 1.11 1.52 1.62 2.12.62 2.52-4.2 4.47-9.8 5.27-14.18.4-2.1 1.2-2.8 1.6-2.8.4 0 1.2.7 1.6 2.8.8 4.38 2.75 9.98 5.27 14.18.6 1 2.34.49 2.12-.62z" />
-      </svg>
+      <img src={iconSrc} alt="Food" className="w-full h-full object-cover rounded-full" />
     );
   }
   switch (tx.type) {
@@ -22,7 +21,7 @@ const getIcon = (tx: Transaction) => {
 
 const getIconBg = (tx: Transaction) => {
   if (tx.title.includes('McDonald') || tx.title.includes('Вкусно — и точка')) {
-    return 'bg-[#ffc72c] text-[#da291c]';
+    return 'bg-transparent overflow-hidden';
   }
   switch (tx.type) {
     case 'transfer': return 'bg-blue-50 text-blue-500 dark:bg-blue-900/20';
@@ -53,7 +52,7 @@ export function History({ state }: { state: GameState }) {
               >
                 <div className="flex items-center gap-4 min-w-0 flex-1">
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 ${getIconBg(tx)}`}>
-                    {getIcon(tx)}
+                    {getIcon(tx, state.language)}
                   </div>
                   <div className="overflow-hidden min-w-0 flex-1">
                     <h3 className="font-medium text-zinc-900 dark:text-white text-sm truncate">{t(tx.title, state.language)}</h3>

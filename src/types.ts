@@ -52,3 +52,9 @@ export interface ShopItem {
   icon: string;
   category: 'food' | 'drinks' | 'tech' | 'misc';
 }
+
+export interface AppNotification {
+  message: string;
+  comment?: string;
+  type?: 'success' | 'error' | 'info' | 'warning' | 'mcd' | 'vkusn' | 'party' | 'transfer';
+}

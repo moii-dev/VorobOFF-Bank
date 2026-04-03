@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { GameState, Transaction } from '../types';
-import { SHOP_ITEMS, SKINS, DEFAULT_CONTACTS } from '../constants';
+import { GameState, Transaction, AppNotification } from '../types';
+import { SHOP_ITEMS, SKINS, DEFAULT_CONTACTS, t } from '../constants';
 
 const vibrate = (pattern: number | number[]) => {
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
-    try { navigator.vibrate(pattern); } catch (e) {}
+    try { navigator.vibrate(pattern); } catch (e) { }
   }
 };
 
@@ -31,9 +31,9 @@ export function useGame() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        return { 
-          ...INITIAL_STATE, 
-          ...parsed, 
+        return {
+          ...INITIAL_STATE,
+          ...parsed,
           transactions: parsed.transactions || [],
           ownedSkins: parsed.ownedSkins || ['default'],
           currentSkin: parsed.currentSkin || 'default',
@@ -52,7 +52,7 @@ export function useGame() {
     return INITIAL_STATE;
   });
 
-  const [notification, setNotification] = useState<string | null>(null);
+  const [notification, setNotification] = useState<AppNotification | null>(null);
 
   const partyLovedRef = useRef<string>('book_xi');
   const partyHatedRef = useRef<string>('pooh');
@@ -72,7 +72,10 @@ export function useGame() {
         setState(prev => {
           if (prev.isGameOver) return prev;
           const newLang = prev.language === 'ru' ? 'zh' : 'ru';
-          setNotification(newLang === 'zh' ? 'Партия изменила язык!' : 'Язык восстановлен');
+          setNotification({
+            message: newLang === 'zh' ? 'Партия изменила язык!' : 'Язык восстановлен',
+            type: 'party'
+          });
           setTimeout(() => setNotification(null), 3000);
           return { ...prev, language: newLang };
         });
@@ -111,8 +114,12 @@ export function useGame() {
           comment: 'Вы разочаровали партию'
         };
 
+        const penaltyTitle = t('Штраф от Партии', prev.language);
         vibrate([100, 50, 100, 50, 100]);
-        setNotification(`Партия разочарована! Штраф: -${actualPenalty} ₽, -${creditPenalty} рейтинга`);
+        setNotification({
+          message: `${penaltyTitle}! Штраф: -${actualPenalty} ₽, -${creditPenalty} рейтинга`,
+          type: 'party'
+        });
         setTimeout(() => setNotification(null), 5000);
 
         return {
@@ -133,21 +140,38 @@ export function useGame() {
         if (prev.partyDemand) return prev; // Already have a demand
         if (Math.random() > 0.2) return prev; // 20% chance every 45s
 
-        const CHINESE_ITEMS = ['tea', 'huawei', 'book_xi', 'ticket_bj', 'pooh', 'dragon'];
-        const randomItem = CHINESE_ITEMS[Math.floor(Math.random() * CHINESE_ITEMS.length)];
-        const minutes = Math.floor(Math.random() * 5) + 1; // 1 to 5
+        // Filter items the user can realistically afford (up to 250% of current balance)
+        const currentItems = SHOP_ITEMS.map(item => {
+          const count = prev.inventory[item.id] || 0;
+          const price = Math.floor(item.basePrice * Math.pow(1.15, count));
+          return { ...item, price };
+        });
+
+        const affordable = currentItems.filter(i => i.price <= Math.max(prev.balance * 2.5, 1000));
         
-        const itemDef = SHOP_ITEMS.find(i => i.id === randomItem);
-        if (!itemDef) return prev;
+        if (affordable.length === 0) return prev;
+
+        const CHINESE_IDS = ['tea', 'huawei', 'book_xi', 'ticket_bj', 'pooh', 'dragon'];
+        const chineseAffordable = affordable.filter(i => CHINESE_IDS.includes(i.id));
+        
+        // 70% chance to pick Chinese if affordable, otherwise any affordable
+        const target = (chineseAffordable.length > 0 && Math.random() < 0.7)
+          ? chineseAffordable[Math.floor(Math.random() * chineseAffordable.length)]
+          : affordable[Math.floor(Math.random() * affordable.length)];
+
+        const minutes = Math.floor(Math.random() * 5) + 1;
         
         vibrate([100, 50, 100]);
-        setNotification(`Партия требует купить: ${itemDef.name}! У вас ${minutes} мин.`);
+        setNotification({
+          message: `${t('Партия требует купить:', prev.language)} ${t(target.name, prev.language)}! ${t('У вас', prev.language)} ${minutes} ${t('мин.', prev.language)}`,
+          type: 'party'
+        });
         setTimeout(() => setNotification(null), 5000);
 
         return {
           ...prev,
           partyDemand: {
-            itemId: randomItem,
+            itemId: target.id,
             expiresAt: Date.now() + minutes * 60 * 1000
           }
         };
@@ -163,7 +187,10 @@ export function useGame() {
         if (!prev.partyDemand) return prev;
         if (Date.now() > prev.partyDemand.expiresAt) {
           vibrate([200, 100, 200, 100, 200]);
-          setNotification("Время вышло! Партия недовольна. -100 рейтинга, -1 кошка-жена, -1 рис");
+          setNotification({
+            message: "Время вышло! Партия недовольна. -100 рейтинга, -1 кошка-жена, -1 рис",
+            type: 'party'
+          });
           setTimeout(() => setNotification(null), 5000);
           return {
             ...prev,
@@ -202,7 +229,7 @@ export function useGame() {
 
         const cost = Math.floor(Math.random() * 300) + 50; // 50 to 350
         const actualCost = Math.min(prev.balance, cost);
-        
+
         const newTx: Transaction = {
           id: Date.now().toString() + Math.random(),
           type: 'random',
@@ -212,7 +239,11 @@ export function useGame() {
         };
 
         vibrate([50, 100, 50]);
-        setNotification(`Списание: Вкусно — и точка (-${actualCost} ₽)`);
+        const mcdPrefix = t('Списание: Вкусно — и точка', prev.language);
+        setNotification({
+          message: `${mcdPrefix} (-${actualCost} ₽)`,
+          type: prev.language === 'zh' ? 'mcd' : 'vkusn'
+        });
         setTimeout(() => setNotification(null), 4000);
 
         return {
@@ -242,7 +273,7 @@ export function useGame() {
           id: Date.now().toString() + Math.random(),
           type: 'purchase',
           amount: -cost,
-          title: `Покупка: ${item.name}`,
+          title: `${t('Покупка:', prev.language)} ${t(item.name, prev.language)}`,
           date: Date.now()
         };
 
@@ -269,16 +300,22 @@ export function useGame() {
           newState.catWives += 1;
           newState.riceBowls += 1;
           vibrate([50, 50, 50]);
-          setNotification("Партия довольна вашей покорностью! +50 рейтинга, +1 кошка-жена, +1 рис");
+          setNotification({
+            message: "Партия довольна вашей покорностью! +50 рейтинга, +1 кошка-жена, +1 рис",
+            type: 'party'
+          });
           setTimeout(() => setNotification(null), 4000);
         } else if (itemId === partyHatedRef.current) {
           newState.catWives = Math.max(0, newState.catWives - 1);
           newState.riceBowls = Math.max(0, newState.riceBowls - 1);
           newState.socialCredit -= 150;
           vibrate([200, 100, 200]);
-          setNotification("Партия в ярости! Вы купили запрещенку. -1 кошка-жена, -1 миска риса, -150 рейтинга");
+          setNotification({
+            message: "Партия в ярости! Вы купили запрещенку. -1 кошка-жена, -1 миска риса, -150 рейтинга",
+            type: 'party'
+          });
           setTimeout(() => setNotification(null), 5000);
-          
+
           const items = SHOP_ITEMS.map(i => i.id);
           partyHatedRef.current = items[Math.floor(Math.random() * items.length)];
         } else if (itemId === partyLovedRef.current) {
@@ -286,9 +323,12 @@ export function useGame() {
           newState.riceBowls += 1;
           newState.socialCredit += 100;
           vibrate([50, 50, 50, 50]);
-          setNotification("Партия гордится вами! +1 кошка-жена, +1 миска риса, +100 рейтинга");
+          setNotification({
+            message: "Партия гордится вами! +1 кошка-жена, +1 миска риса, +100 рейтинга",
+            type: 'party'
+          });
           setTimeout(() => setNotification(null), 5000);
-          
+
           const items = SHOP_ITEMS.map(i => i.id);
           partyLovedRef.current = items[Math.floor(Math.random() * items.length)];
         }
@@ -307,20 +347,24 @@ export function useGame() {
           id: Date.now().toString() + Math.random(),
           type: 'transfer',
           amount: -amount,
-          title: `Перевод: ${contactName}`,
+          title: `${t('Перевод:', prev.language)} ${contactName}`,
           date: Date.now()
         };
-        
-        setNotification(`Перевод выполнен: ${contactName} (-${amount} ₽)`);
+
+        const transferPrefix = t('Перевод выполнен:', prev.language);
+        setNotification({
+          message: `${transferPrefix} ${contactName} (-${amount} ₽)`,
+          type: 'transfer'
+        });
         setTimeout(() => setNotification(null), 3000);
 
         // Update recent contacts if it's a new SBP transfer
         let newRecentContacts = prev.recentContacts;
         if (!prev.recentContacts.find(c => c.id === contactId)) {
-           newRecentContacts = [
-             { id: contactId, name: contactName, avatar: contactName.charAt(0).toUpperCase() },
-             ...prev.recentContacts
-           ].slice(0, 10); // Keep top 10
+          newRecentContacts = [
+            { id: contactId, name: contactName, avatar: contactName.charAt(0).toUpperCase() },
+            ...prev.recentContacts
+          ].slice(0, 10); // Keep top 10
         }
 
         const returnAmount = Math.floor(amount * 0.1);
@@ -333,22 +377,26 @@ export function useGame() {
                 'это на вкусную точку тебе',
                 'а это за минет',
                 'на пиво',
-                'возвращаю долг',
-                'от души брат',
-                'на новые скины'
+                'спасибо за ночь',
+                'отсоси хуй',
+                'Бери и соси'
               ];
               const randomComment = COMMENTS[Math.floor(Math.random() * COMMENTS.length)];
               const returnTx: Transaction = {
                 id: Date.now().toString() + Math.random(),
                 type: 'income',
                 amount: returnAmount,
-                title: `От: ${contactName}`,
+                title: `${t('От:', current.language)} ${contactName}`,
                 date: Date.now(),
                 comment: randomComment
               };
 
               vibrate([30, 50, 30, 50, 30]);
-              setNotification(`+${returnAmount} ₽ от ${contactName}`);
+              setNotification({
+                message: `+${returnAmount} ₽ от ${contactName}`,
+                comment: randomComment,
+                type: 'transfer'
+              });
               setTimeout(() => setNotification(null), 4000);
 
               return {
@@ -390,11 +438,15 @@ export function useGame() {
           id: Date.now().toString() + Math.random(),
           type: 'purchase',
           amount: -skin.price,
-          title: `Покупка скина: ${skin.name}`,
+          title: `${t('Покупка скина:', prev.language)} ${t(skin.name, prev.language)}`,
           date: Date.now()
         };
 
-        setNotification(`Скин куплен: ${skin.name}`);
+        const skinPrefix = t('Скин куплен:', prev.language);
+        setNotification({
+          message: `${skinPrefix} ${t(skin.name, prev.language)}`,
+          type: 'success'
+        });
         setTimeout(() => setNotification(null), 3000);
 
         return {
