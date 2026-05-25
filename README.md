@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="public/img/1.jpg" width="140" alt="VorobOFF Bank avatar" />
+  <img src="public/logo.svg" width="360" alt="VorobOFF Bank logo" />
 
   # VorobOFF Bank
 
