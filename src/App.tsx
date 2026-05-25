@@ -8,13 +8,13 @@ import { Home } from './components/Home';
 import { Shop } from './components/Shop';
 import { Transfers } from './components/Transfers';
 import { History } from './components/History';
-import { Skins } from './components/Skins';
+import { Dep } from './components/Dep';
 import { useGame } from './hooks/useGame';
-import { Home as HomeIcon, ShoppingBag, Send, Clock, UserCircle, RefreshCw } from 'lucide-react';
+import { Home as HomeIcon, ShoppingBag, Send, Clock, Dices, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { t } from './constants';
 
-type Tab = 'home' | 'transfers' | 'skins' | 'history' | 'shop';
+type Tab = 'home' | 'transfers' | 'dep' | 'history' | 'shop';
 
 const vibrate = (pattern: number | number[]) => {
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -23,7 +23,7 @@ const vibrate = (pattern: number | number[]) => {
 };
 
 export default function App() {
-  const { state, click, buyItem, getCost, transferMoney, buySkin, equipSkin, notification } = useGame();
+  const { state, click, buyItem, getCost, transferMoney, buySkin, equipSkin, playDepGame, notification } = useGame();
   const [activeTab, setActiveTab] = useState<Tab>('home');
 
   const handleTabChange = (tab: Tab) => {
@@ -112,7 +112,7 @@ export default function App() {
           <AnimatePresence mode="wait">
             {activeTab === 'home' && (
               <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="absolute inset-0">
-                <Home state={state} onClick={click} />
+                <Home state={state} onClick={click} onBuySkin={buySkin} onEquipSkin={equipSkin} />
               </motion.div>
             )}
             {activeTab === 'transfers' && (
@@ -120,9 +120,9 @@ export default function App() {
                 <Transfers state={state} onTransfer={transferMoney} />
               </motion.div>
             )}
-            {activeTab === 'skins' && (
-              <motion.div key="skins" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="absolute inset-0">
-                <Skins state={state} onBuy={buySkin} onEquip={equipSkin} />
+            {activeTab === 'dep' && (
+              <motion.div key="dep" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }} className="absolute inset-0">
+                <Dep state={state} onPlay={playDepGame} />
               </motion.div>
             )}
             {activeTab === 'history' && (
@@ -159,13 +159,13 @@ export default function App() {
               <span className="text-[10px] font-medium">{t('Переводы', state.language)}</span>
             </button>
             <button
-              onClick={() => handleTabChange('skins')}
+              onClick={() => handleTabChange('dep')}
               className={`flex flex-col items-center justify-center w-full py-2 rounded-full transition-colors ${
-                activeTab === 'skins' ? 'text-yellow-600 dark:text-yellow-400' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'
+                activeTab === 'dep' ? 'text-yellow-600 dark:text-yellow-400' : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'
               }`}
             >
-              <UserCircle className="w-6 h-6 mb-1" />
-              <span className="text-[10px] font-medium">{t('Скины', state.language)}</span>
+              <Dices className="w-6 h-6 mb-1" />
+              <span className="text-[10px] font-medium">{t('Деп', state.language)}</span>
             </button>
             <button
               onClick={() => handleTabChange('history')}

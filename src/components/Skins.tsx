@@ -1,14 +1,33 @@
 import React from 'react';
 import { GameState } from '../types';
 import { SKINS } from '../constants';
-import { Check, Lock, Unlock } from 'lucide-react';
+import { ArrowLeft, Check, Lock, Unlock } from 'lucide-react';
 import { motion } from 'motion/react';
 import { t } from '../constants';
 
-export function Skins({ state, onBuy, onEquip }: { state: GameState, onBuy: (id: string) => void, onEquip: (id: string) => void }) {
+interface SkinsProps {
+  state: GameState;
+  onBuy: (id: string) => void;
+  onEquip: (id: string) => void;
+  onBack?: () => void;
+}
+
+export function Skins({ state, onBuy, onEquip, onBack }: SkinsProps) {
   return (
     <div className="h-full overflow-y-auto px-6 py-8 pb-32">
-      <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-6">{t('Скины', state.language)}</h2>
+      <div className="flex items-center gap-3 mb-6">
+        {onBack && (
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={onBack}
+            className="w-11 h-11 rounded-full bg-white/70 dark:bg-zinc-900/80 border border-zinc-100 dark:border-zinc-800 shadow-sm flex items-center justify-center text-zinc-700 dark:text-zinc-200 hover:bg-white dark:hover:bg-zinc-800 transition-colors"
+            aria-label={t('Назад', state.language)}
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </motion.button>
+        )}
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white">{t('Скины', state.language)}</h2>
+      </div>
       
       <div className="space-y-4">
         {SKINS.map(skin => {

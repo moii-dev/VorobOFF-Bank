@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { GameState } from '../types';
-import { TrendingUp, MousePointerClick } from 'lucide-react';
+import { UserCircle } from 'lucide-react';
 import { SKINS, t } from '../constants';
+import { Skins } from './Skins';
 
 const vibrate = (pattern: number | number[]) => {
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -13,6 +14,8 @@ const vibrate = (pattern: number | number[]) => {
 interface HomeProps {
   state: GameState;
   onClick: () => void;
+  onBuySkin: (id: string) => void;
+  onEquipSkin: (id: string) => void;
 }
 
 interface ClickAnim {
@@ -22,8 +25,9 @@ interface ClickAnim {
   value: number;
 }
 
-export function Home({ state, onClick }: HomeProps) {
+export function Home({ state, onClick, onBuySkin, onEquipSkin }: HomeProps) {
   const [clicks, setClicks] = useState<ClickAnim[]>([]);
+  const [showSkins, setShowSkins] = useState(false);
   const clickIdRef = useRef(0);
 
   const currentSkinObj = SKINS.find(s => s.id === state.currentSkin) || SKINS[0];
@@ -43,6 +47,17 @@ export function Home({ state, onClick }: HomeProps) {
       setClicks((prev) => prev.filter((c) => c.id !== id));
     }, 1000);
   };
+
+  if (showSkins) {
+    return (
+      <Skins
+        state={state}
+        onBuy={onBuySkin}
+        onEquip={onEquipSkin}
+        onBack={() => setShowSkins(false)}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-start h-full px-6 py-6 overflow-y-auto pb-24">
@@ -165,6 +180,20 @@ export function Home({ state, onClick }: HomeProps) {
           </AnimatePresence>
         </motion.div>
       </div>
+
+      <motion.button
+        whileTap={{ scale: 0.96 }}
+        onClick={() => setShowSkins(true)}
+        className="w-full max-w-md mb-3 rounded-full bg-white/70 dark:bg-white/10 backdrop-blur-md border border-white/80 dark:border-white/10 px-5 py-3 shadow-sm text-zinc-800 dark:text-white flex items-center justify-between shrink-0 hover:bg-white/90 dark:hover:bg-white/15 transition-colors"
+      >
+        <span className="flex items-center gap-2 text-sm font-black uppercase tracking-wider">
+          <UserCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+          {t('Скины', state.language)}
+        </span>
+        <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+          {state.ownedSkins.length}/{SKINS.length}
+        </span>
+      </motion.button>
     </div>
   );
 }

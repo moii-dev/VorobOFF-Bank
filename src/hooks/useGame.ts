@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { GameState, Transaction, AppNotification } from '../types';
+import { DepGameResult, GameState, Transaction, AppNotification } from '../types';
 import { SHOP_ITEMS, SKINS, DEFAULT_CONTACTS, t } from '../constants';
+import { calculateDepRatingPenalty, calculateDepWheelConfig, getDepResultSegment } from '../game/dep';
 
 const vibrate = (pattern: number | number[]) => {
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -24,6 +25,8 @@ const INITIAL_STATE: GameState = {
   language: 'ru',
   isGameOver: false,
 };
+
+const DEP_SPIN_SETTLE_DELAY_MS = 2400;
 
 export function useGame() {
   const [state, setState] = useState<GameState>(() => {
@@ -56,6 +59,7 @@ export function useGame() {
 
   const partyLovedRef = useRef<string>('book_xi');
   const partyHatedRef = useRef<string>('pooh');
+  const depInProgressRef = useRef(false);
 
   // Game Over Check
   useEffect(() => {
@@ -426,6 +430,73 @@ export function useGame() {
     return Math.floor(item.basePrice * Math.pow(1.15, currentCount));
   }, [state.inventory]);
 
+  const playDepGame = useCallback((bet: number): DepGameResult | null => {
+    const normalizedBet = Math.floor(bet);
+    if (depInProgressRef.current || !Number.isFinite(normalizedBet) || normalizedBet <= 0 || normalizedBet > state.balance) {
+      return null;
+    }
+
+    depInProgressRef.current = true;
+    const wheelConfig = calculateDepWheelConfig(normalizedBet, state.balance);
+    const winChance = wheelConfig.winChance;
+    const ratingPenalty = Math.min(state.socialCredit, calculateDepRatingPenalty(normalizedBet, state.balance));
+    const isWin = Math.random() < winChance;
+    const resultSegment = getDepResultSegment(wheelConfig, isWin);
+    const payout = isWin ? normalizedBet * 2 : 0;
+    const balanceChange = payout - normalizedBet;
+    const partyMessage = ratingPenalty > 0
+      ? `Партия Китая осуждает азарт. -${ratingPenalty} рейтинга`
+      : 'Социальный рейтинг уже на дне. Партия просто смотрит молча.';
+
+    const result: DepGameResult = {
+      bet: normalizedBet,
+      payout,
+      isWin,
+      winChance,
+      totalSlots: wheelConfig.totalSlots,
+      winningSlots: wheelConfig.winningSlots,
+      losingSlots: wheelConfig.losingSlots,
+      resultSlotIndex: resultSegment.index,
+      resultSlotCenterAngle: resultSegment.centerAngle,
+      ratingPenalty,
+      partyMessage,
+      balanceChange,
+    };
+
+    window.setTimeout(() => {
+      setState(prev => {
+
+      const newTx: Transaction = {
+        id: Date.now().toString() + Math.random(),
+        type: 'dep',
+        amount: balanceChange,
+        title: isWin ? 'Деп: колесо фортуны выигрыш' : 'Деп: колесо фортуны проигрыш',
+        date: Date.now(),
+        comment: partyMessage
+      };
+
+      return {
+        ...prev,
+        balance: prev.balance + balanceChange,
+        socialCredit: Math.max(0, prev.socialCredit - ratingPenalty),
+        transactions: [newTx, ...prev.transactions].slice(0, 100)
+      };
+    });
+
+    vibrate(isWin ? [40, 40, 80] : [100, 40, 100]);
+    setNotification({
+      message: isWin
+        ? `Колесо занесло x2: +${normalizedBet} ₽. ${partyMessage}`
+        : `Колесо молчит: -${normalizedBet} ₽. ${partyMessage}`,
+      type: 'party'
+    });
+    setTimeout(() => setNotification(null), 4000);
+      depInProgressRef.current = false;
+    }, DEP_SPIN_SETTLE_DELAY_MS);
+
+    return result;
+  }, [state.balance, state.socialCredit]);
+
   const buySkin = useCallback((skinId: string) => {
     const skin = SKINS.find(s => s.id === skinId);
     if (!skin) return;
@@ -471,5 +542,5 @@ export function useGame() {
     });
   }, []);
 
-  return { state, click, buyItem, getCost, transferMoney, buySkin, equipSkin, notification };
+  return { state, click, buyItem, getCost, transferMoney, buySkin, equipSkin, playDepGame, notification };
 }

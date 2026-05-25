@@ -1,10 +1,25 @@
 export interface Transaction {
   id: string;
-  type: 'transfer' | 'purchase' | 'random' | 'income';
+  type: 'transfer' | 'purchase' | 'random' | 'income' | 'dep';
   amount: number;
   title: string;
   date: number;
   comment?: string;
+}
+
+export interface DepGameResult {
+  bet: number;
+  payout: number;
+  isWin: boolean;
+  winChance: number;
+  totalSlots: number;
+  winningSlots: number;
+  losingSlots: number;
+  resultSlotIndex: number;
+  resultSlotCenterAngle: number;
+  ratingPenalty: number;
+  partyMessage: string;
+  balanceChange: number;
 }
 
 export interface Skin {

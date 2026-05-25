@@ -1,6 +1,6 @@
 import React from 'react';
 import { GameState, Transaction } from '../types';
-import { ArrowUpRight, ShoppingBag, AlertCircle } from 'lucide-react';
+import { ArrowUpRight, ShoppingBag, AlertCircle, Dices } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { t } from '../constants';
 
@@ -14,6 +14,7 @@ const getIcon = (tx: Transaction, language: 'ru' | 'zh') => {
   switch (tx.type) {
     case 'transfer': return <ArrowUpRight className="w-5 h-5" />;
     case 'purchase': return <ShoppingBag className="w-5 h-5" />;
+    case 'dep': return <Dices className="w-5 h-5" />;
     case 'random': return <AlertCircle className="w-5 h-5" />;
     default: return <ArrowUpRight className="w-5 h-5" />;
   }
@@ -25,6 +26,7 @@ const getIconBg = (tx: Transaction) => {
   }
   switch (tx.type) {
     case 'transfer': return 'bg-blue-50 text-blue-500 dark:bg-blue-900/20';
+    case 'dep': return 'bg-red-50 text-red-500 dark:bg-red-900/20';
     case 'random': return 'bg-orange-50 text-orange-500 dark:bg-orange-900/20';
     default: return 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20';
   }
