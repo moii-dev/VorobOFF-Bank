@@ -1,20 +1,127 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+  <img src="public/img/1.jpg" width="140" alt="VorobOFF Bank avatar" />
+
+  # VorobOFF Bank
+
+  **Мобильный банковский кликер на React: баланс, магазин улучшений, переводы, история операций и мини-игра с колесом удачи.**
+
+  <p>
+    <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=111" />
+    <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=flat-square&logo=typescript&logoColor=fff" />
+    <img alt="Vite" src="https://img.shields.io/badge/Vite-6-646CFF?style=flat-square&logo=vite&logoColor=fff" />
+    <img alt="Tailwind CSS" src="https://img.shields.io/badge/Tailwind_CSS-4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=fff" />
+  </p>
 </div>
 
-# Run and deploy your AI Studio app
+## О проекте
 
-This contains everything you need to run your app locally.
+VorobOFF Bank - это интерактивное веб-приложение в формате мобильного банковского интерфейса. Игрок зарабатывает виртуальные рубли кликами и пассивным доходом, покупает улучшения, переводит деньги контактам, следит за историей операций и рискует балансом в разделе "Деп".
 
-View your app in AI Studio: https://ai.studio/apps/451ef8f7-0241-4b6a-8a37-20e8cc1908ed
+Прогресс сохраняется локально в браузере через `localStorage`, поэтому игру можно закрыть и продолжить позже.
 
-## Run Locally
+## Возможности
 
-**Prerequisites:**  Node.js
+- главный экран с балансом, доходом за клик и пассивным доходом;
+- магазин предметов с растущей стоимостью улучшений;
+- покупка и выбор скинов персонажа;
+- переводы по контактам и ручной перевод по имени;
+- история покупок, переводов, доходов и игровых событий;
+- мини-игра "Деп" с колесом удачи и расчетом шанса выигрыша;
+- случайные события, штрафы и временные требования;
+- переключение интерфейса между русским и китайским языком игровыми событиями;
+- адаптивный мобильный layout с темной темой и анимациями.
 
+## Стек
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- **React 19** - UI.
+- **TypeScript** - типизация состояния и игровых моделей.
+- **Vite 6** - dev server и сборка.
+- **Tailwind CSS 4** - стилизация.
+- **motion** - анимации экранов и уведомлений.
+- **lucide-react** - иконки.
+
+## Быстрый старт
+
+### Требования
+
+- Node.js 20+ или актуальная LTS-версия.
+- npm.
+
+### Установка
+
+```bash
+npm install
+```
+
+### Переменные окружения
+
+В репозитории есть пример `.env.example`. Для текущей игровой логики ключ Gemini не используется напрямую в `src`, но Vite-конфиг прокидывает `GEMINI_API_KEY`, поэтому файл можно создать при необходимости:
+
+```bash
+cp .env.example .env.local
+```
+
+Значения секретов не коммитьте в репозиторий.
+
+### Запуск в режиме разработки
+
+```bash
+npm run dev
+```
+
+Приложение будет доступно по адресу:
+
+```text
+http://localhost:3000
+```
+
+### Проверка типов
+
+```bash
+npm run lint
+```
+
+### Production-сборка
+
+```bash
+npm run build
+```
+
+### Предпросмотр сборки
+
+```bash
+npm run preview
+```
+
+## Структура проекта
+
+```text
+.
+├── public/img/          # изображения персонажей и игровых событий
+├── src/
+│   ├── components/      # экраны приложения
+│   ├── game/            # игровая логика мини-игры
+│   ├── hooks/           # состояние и бизнес-логика игры
+│   ├── App.tsx          # навигация и общий layout
+│   ├── constants.ts     # предметы, скины, контакты и словарь
+│   ├── index.css        # глобальные стили
+│   └── types.ts         # TypeScript-модели
+├── vite.config.ts       # конфигурация Vite
+├── render.yaml          # статический деплой на Render
+└── package.json         # команды и зависимости
+```
+
+## Деплой
+
+Проект уже содержит `render.yaml` для статического деплоя на Render:
+
+- команда сборки: `npm install && npm run build`;
+- директория публикации: `dist`;
+- все маршруты переписываются на `index.html`.
+
+## Важные детали
+
+- Все игровые данные хранятся только в браузере пользователя.
+- Очистка `localStorage` сбрасывает прогресс.
+- Проект является игровым прототипом, а не реальным банковским приложением.
+- Лицензия отдельным файлом в репозитории не указана.
