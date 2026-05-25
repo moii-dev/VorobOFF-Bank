@@ -63,7 +63,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-white font-sans selection:bg-yellow-200 dark:selection:bg-yellow-900 flex flex-col justify-center">
       <div className="w-full max-w-[380px] mx-auto h-screen sm:h-[850px] sm:max-h-[95vh] relative overflow-hidden flex flex-col bg-zinc-50/50 dark:bg-zinc-950/50 shadow-2xl sm:rounded-[2.5rem] sm:border sm:border-zinc-200 dark:sm:border-zinc-800">
-        
         {/* Toast Notification */}
         <AnimatePresence>
           {notification && (
